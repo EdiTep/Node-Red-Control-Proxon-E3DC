@@ -1,4 +1,4 @@
-# Proxon T300 Warmwasser Speicher PV Vorrang Schalteingangs mit ShellyPlus1 per MQTT und Node-Red steuern
+# Proxon T300 Warmwasser Speicher PV Vorrang Schalteingang mit ShellyPlus1 per MQTT und Node-Red steuern
 
 ## Übersicht des Projekts
 Steuerung des PV Vorrang Schalteingangs des T300 Warmwasserspeichers einer Proxon Lüftungsheizung mittles eines ShellyPlus1 über Node-Red und MQTT.
