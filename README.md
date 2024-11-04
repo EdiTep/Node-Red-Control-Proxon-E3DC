@@ -10,13 +10,16 @@ The control line can be led out of the T300 through an existing opening at the r
 
 The terminal block X13 has 3.3 V at the connection itself. Following Parameters in the installer menu (code 1000) have to be adapted:
 
-    Set F22 PV mode to SG (Smart Grid). This activates the digital input.
-    Set F23 PV Eheiz to 5V.
-    Set F24 PV WP to 5V.
+In the Installer menu:
+
+    Set F22 PV mode to SG (Smart Grid). This activates the digital input
+    Set F23 PV Eheiz to 5V
+    Set F24 PV WP to 5V
+    Set F25 WP Time to 5 min (or what you want, this is the time to wait bevor X13 switches to on)
 
 In the Settings menu:
 
-    D05 PV Priority ON.
+    D05 PV Priority ON
 
 After I contacted Zimmermann, they sent me a CVS file with all the Modbus information, the wiring can be seen on the circuit diagrams that were given to me at the time of acceptance.
 Please leave me an email via PM and I can send you the CSV file.
@@ -24,11 +27,15 @@ Please leave me an email via PM and I can send you the CSV file.
 
 ## Installation, requirements
 1. Raspberry Pi is required as host for the other requirement
-3. Install Node-Red with Dashboard and MQTT Broker
-4. RSCP to MQTT Dashboard v1.0
+2. Install an MQTT Broker (i used Mosquitto)
+3. Install Node-Red with Dashboard
+4. Install RSCP to MQTT Dashboard v1.0
    - Download on Github here: https://github.com/pvtom/rscp2mqtt-dashboard
 5. Configure ShellyPlus1 and integrate it into the network, so you can use it via MQTT
-6. Connect the Shelly
+6. Connect the switching input of the Shelly to X13 1 + 2
     
 ## Node-Red Flow
 The flow is available as a JSON file in the project and can be downloaded or the JSON code can be copied
+
+## Documentation to set the T300 Parameters
+A PDF-File with the Docu with screenshots is also available here in the project
