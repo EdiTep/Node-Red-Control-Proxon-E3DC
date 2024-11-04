@@ -1,0 +1,1107 @@
+[
+    {
+        "id": "0a84b244800e8247",
+        "type": "group",
+        "z": "7ef373a00e10516c",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "05fc060bd26e4089",
+            "dfc61f75940d3c66",
+            "eff750731d0990d5",
+            "2bdb79883b954acb",
+            "02ad5aae205da174",
+            "18452708c0b73fae",
+            "d7f99ac2359e19a3",
+            "a708c32a3446469d",
+            "2fd982002462245e",
+            "33f3eed00bc3718b",
+            "b172759af4d97713",
+            "d7c853e5c3b96baa",
+            "f97416f502395c53",
+            "6d02d08b05d294d1",
+            "3e54535e6aae6d57",
+            "ee0fd2f5b3fc0947",
+            "fc1e048978525d93",
+            "20a63eef0ba4f3c6",
+            "bb87556ffb1b8363",
+            "030e6d5e64bf2215",
+            "e63c3dba1cd08de8",
+            "e4163a6c1a155bb4",
+            "573dde1f82267408",
+            "2c75e1915891a96e",
+            "b2bd78e514f07082",
+            "b5015436dff96404",
+            "4f72183c2032b57f",
+            "1a8d08504ced80b0",
+            "6f42c5bc3d35bcde",
+            "d1a3ea2ff70442c4",
+            "0e94415422a04522",
+            "02fd191bf7410fb6",
+            "3eecca5ce515b52c",
+            "9e8ec577ac9bd8c8",
+            "af696281252ae973",
+            "20dc12569de7555f",
+            "18f60484b67ec067",
+            "22137cec5a557070",
+            "a40133bad02c1719",
+            "fc4917821ea2fc51",
+            "a45718bdbbd4e11d",
+            "9f2ced77c1845ad8",
+            "b2ab691f890f8bd0"
+        ],
+        "x": 14,
+        "y": 19,
+        "w": 1092,
+        "h": 650
+    },
+    {
+        "id": "05fc060bd26e4089",
+        "type": "mqtt in",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "",
+        "topic": "Haus/Keller/Shelly/PVBoiler/command/switch:0",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "88539582a8a310de",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 220,
+        "y": 100,
+        "wires": [
+            [
+                "9f2ced77c1845ad8"
+            ]
+        ]
+    },
+    {
+        "id": "dfc61f75940d3c66",
+        "type": "mqtt out",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "",
+        "topic": "Haus/Keller/Shelly/Luftentfeuchter/command/switch:0",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "88539582a8a310de",
+        "x": 880,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "eff750731d0990d5",
+        "type": "comment",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "E3DC Hauskraftwerk - Akku Ladung % + PV Watt auswerten => ShellyPlus1 => Boiler BOOST de- / aktivieren einstellbarem Grenzwert XX % + XXXX Watt",
+        "info": "",
+        "x": 550,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "2bdb79883b954acb",
+        "type": "ui_gauge",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "E3DC Akku Ladezustand in %",
+        "group": "3b18bed1450c9878",
+        "order": 2,
+        "width": 6,
+        "height": 5,
+        "gtype": "gage",
+        "title": "E3DC Akku Ladezustand in %",
+        "label": "%",
+        "format": "{{value | number:0}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#ff9200",
+            "#e6e600",
+            "#00f900"
+        ],
+        "seg1": "69",
+        "seg2": "71",
+        "diff": false,
+        "className": "",
+        "x": 510,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "02ad5aae205da174",
+        "type": "function",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Akku% + Solar Watt Vergleich Grenzwerte",
+        "func": "// Prüfe, ob der Schwellenwert für Akku oder Solar aktualisiert wird\nif (msg.topic === \"threshold\") {\n    context.set(\"threshold_akku\", msg.payload);\n} else if (msg.topic === \"thresholdsolar\") {\n    context.set(\"threshold_solar\", msg.payload);\n}\n\n// Lade die gespeicherten Schwellwerte aus dem Context\nlet threshold_akku = context.get(\"threshold_akku\");\nlet threshold_solar = context.get(\"threshold_solar\");\n\n// Wenn die Schwellenwerte noch nicht gesetzt sind, nicht weitermachen\nif (threshold_akku === undefined || threshold_solar === undefined) {\n    node.warn(\"Schwellwerte nicht gesetzt. Warte auf Threshold.\");\n    return null;\n}\n\n// Prüfe, ob die Nachricht vom Akku oder der Solareinspeisung stammt\nif (msg.topic === \"Haus/Keller/e3dc/battery/soc\") {\n    context.set(\"battery_soc\", msg.payload);\n}\nif (msg.topic === \"Haus/Keller/e3dc/solar/power\") {\n    context.set(\"solar_power\", msg.payload);\n}\n\n// Lade die aktuellen Werte für Akku und Solar aus dem Context\nlet battery_soc = context.get(\"battery_soc\");\nlet solar_power = context.get(\"solar_power\");\n\n// Wenn keine gültigen Werte für Akku oder Solar vorhanden sind, nicht weitermachen\nif (battery_soc === undefined || solar_power === undefined) {\n    node.warn(\"Werte für Akku oder Einspeisung nicht vorhanden. Warte auf Eingabewerte.\");\n    return null;\n}\n\n// Debug-Ausgabe für Akku, Solar und Threshold-Werte\nnode.warn(\"Akkustand: \" + battery_soc + \"%, Einspeisung: \" + solar_power + \" Watt, Grenzwert Akku: \" + threshold_akku + \" %, Grenzwert Einspeisung: \" + threshold_solar + \" Watt\");\n\n// Prüfe, ob beide Werte die Schwellenwerte erfüllen\nif (battery_soc >= threshold_akku && solar_power >= threshold_solar) {\n    node.warn(\"Bedingungen erfüllt: Shelly wird eingeschaltet.\");\n    return {\n        topic: \"Haus/Keller/Shelly/PVBoiler/command/switch:0\",\n        payload: \"on\",\n        led: \"on\"  // LED Payload\n    };\n} else {\n    node.warn(\"Bedingungen NICHT erfüllt: Shelly wird ausgeschaltet.\");\n    return {\n        topic: \"Haus/Keller/Shelly/PVBoiler/command/switch:0\",\n        payload: \"off\",\n        led: \"off\"  // LED Payload\n    };\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 280,
+        "wires": [
+            [
+                "d7f99ac2359e19a3",
+                "18452708c0b73fae",
+                "2c75e1915891a96e",
+                "0e94415422a04522",
+                "a40133bad02c1719"
+            ]
+        ]
+    },
+    {
+        "id": "18452708c0b73fae",
+        "type": "mqtt out",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "ShellyPlus1 PV Vorrang Boiler BOOST",
+        "topic": "Haus/Keller/Shelly/PVBoiler/command/switch:0",
+        "qos": "2",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "88539582a8a310de",
+        "x": 930,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "d7f99ac2359e19a3",
+        "type": "debug",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "on / off von Function",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 960,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "a708c32a3446469d",
+        "type": "inject",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Schwelle Akku",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "8",
+        "payloadType": "num",
+        "x": 140,
+        "y": 480,
+        "wires": [
+            [
+                "2fd982002462245e"
+            ]
+        ]
+    },
+    {
+        "id": "2fd982002462245e",
+        "type": "ui_slider",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Grenzwert Akku einstellen",
+        "label": "Grenzwert %",
+        "tooltip": "",
+        "group": "3b18bed1450c9878",
+        "order": 5,
+        "width": 6,
+        "height": 3,
+        "passthru": true,
+        "outs": "end",
+        "topic": "threshold",
+        "topicType": "str",
+        "min": "20",
+        "max": 100,
+        "step": "2",
+        "className": "",
+        "x": 370,
+        "y": 480,
+        "wires": [
+            [
+                "33f3eed00bc3718b",
+                "02ad5aae205da174",
+                "02fd191bf7410fb6"
+            ]
+        ]
+    },
+    {
+        "id": "33f3eed00bc3718b",
+        "type": "ui_text",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "group": "3b18bed1450c9878",
+        "order": 7,
+        "width": 5,
+        "height": 2,
+        "name": "",
+        "label": "BOOST beenden unter (Akku)",
+        "format": "{{msg.payload}} %",
+        "layout": "col-center",
+        "className": "",
+        "style": true,
+        "font": "Arial Black,Arial Black,Gadget,sans-serif",
+        "fontSize": "18",
+        "color": "#ff9200",
+        "x": 950,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "b172759af4d97713",
+        "type": "mqtt in",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "",
+        "topic": "Haus/Keller/e3dc/battery/power",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "88539582a8a310de",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 568,
+        "wires": [
+            [
+                "3e54535e6aae6d57"
+            ]
+        ]
+    },
+    {
+        "id": "d7c853e5c3b96baa",
+        "type": "ui_gauge",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Batterie Be- Entladung in Watt",
+        "group": "3b18bed1450c9878",
+        "order": 4,
+        "width": 6,
+        "height": 5,
+        "gtype": "gage",
+        "title": "Batterie Be- Entladung in Watt",
+        "label": "Watt",
+        "format": "{{value | number:0}}",
+        "min": "-500",
+        "max": "1000",
+        "colors": [
+            "#ff2600",
+            "#e6e600",
+            "#60c453"
+        ],
+        "seg1": "0",
+        "seg2": "400",
+        "diff": false,
+        "className": "",
+        "x": 950,
+        "y": 568,
+        "wires": []
+    },
+    {
+        "id": "f97416f502395c53",
+        "type": "mqtt in",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "",
+        "topic": "Haus/Keller/e3dc/home/power",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "88539582a8a310de",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 628,
+        "wires": [
+            [
+                "573dde1f82267408"
+            ]
+        ]
+    },
+    {
+        "id": "6d02d08b05d294d1",
+        "type": "ui_gauge",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Hausverbrauch aktuell in Watt",
+        "group": "3b18bed1450c9878",
+        "order": 1,
+        "width": 6,
+        "height": 5,
+        "gtype": "gage",
+        "title": "Hausverbrauch aktuell in Watt",
+        "label": "Watt",
+        "format": "{{value | number:0}}",
+        "min": "0",
+        "max": "4500",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "500",
+        "seg2": "1500",
+        "diff": false,
+        "className": "",
+        "x": 950,
+        "y": 628,
+        "wires": []
+    },
+    {
+        "id": "3e54535e6aae6d57",
+        "type": "function",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Dynamische Werte für Gauge",
+        "func": "const value = msg.payload;\n\n// Rundung auf ganze Zahlen\nconst roundedValue = Math.round(value);\n\nconst absValue = Math.abs(roundedValue);\n\n// Berechnung des maxWert, 120% vom absoluten Wert, immer im positiven Bereich\nlet maxWert = Math.round(absValue * 1.2 + 200);\n\n// Berechnung des minWert, abhängig davon, ob value positiv oder negativ ist\nlet minWert = roundedValue < 0 ? Math.round(-absValue * 1.5) : Math.round(-absValue * 0.5);\n\nlet minSeg = Math.round(absValue * 0.4);  // 40% vom absoluten Wert\nlet maxSeg = Math.round(absValue * 0.8);  // 80% vom absoluten Wert\n\n// Debug-Ausgabe zur Überprüfung\n// node.warn(\"Akku Ladung - Max Wert: \" + maxWert + \", Min Wert: \" + minWert + \", Min Seg: \" + minSeg + \", Max Seg: \" + maxSeg);\n\nmsg = {\n    ui_control: {\n        gtype: \"gage\",\n        min: minWert,\n        max: maxWert,\n        colors: [\"red\", \"orange\", \"green\"],\n        seg1: minSeg,\n        seg2: maxSeg\n    },\n    // Sende die gerundeten Werte an das ui_gauge\n    payload: roundedValue\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 568,
+        "wires": [
+            [
+                "d7c853e5c3b96baa"
+            ]
+        ]
+    },
+    {
+        "id": "ee0fd2f5b3fc0947",
+        "type": "mqtt in",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Einspeisung Wert",
+        "topic": "Haus/Keller/e3dc/solar/power",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "88539582a8a310de",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 120,
+        "y": 220,
+        "wires": [
+            [
+                "b2bd78e514f07082",
+                "6f42c5bc3d35bcde",
+                "02ad5aae205da174"
+            ]
+        ]
+    },
+    {
+        "id": "fc1e048978525d93",
+        "type": "ui_gauge",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Einspeisung Watt",
+        "group": "3b18bed1450c9878",
+        "order": 3,
+        "width": 6,
+        "height": 5,
+        "gtype": "gage",
+        "title": "E3DC Solar Strom Einspeisung in Watt",
+        "label": "Watt",
+        "format": "{{value | number:0}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#ff9200",
+            "#e6e600",
+            "#00f900"
+        ],
+        "seg1": "69",
+        "seg2": "71",
+        "diff": false,
+        "className": "",
+        "x": 630,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "20a63eef0ba4f3c6",
+        "type": "ui_led",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "order": 10,
+        "group": "3b18bed1450c9878",
+        "width": 6,
+        "height": 3,
+        "label": "ShellyPlus1 AN / AUS",
+        "labelPlacement": "left",
+        "labelAlignment": "center",
+        "colorForValue": [
+            {
+                "color": "#ff0000",
+                "value": "false",
+                "valueType": "bool"
+            },
+            {
+                "color": "#00f900",
+                "value": "true",
+                "valueType": "bool"
+            }
+        ],
+        "allowColorForValueInMessage": true,
+        "shape": "circle",
+        "showGlow": true,
+        "name": "ShellyPlus1 AN / AUS",
+        "x": 960,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "bb87556ffb1b8363",
+        "type": "mqtt in",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Akku Ladung",
+        "topic": "Haus/Keller/e3dc/battery/soc",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "88539582a8a310de",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 110,
+        "y": 160,
+        "wires": [
+            [
+                "2bdb79883b954acb",
+                "02ad5aae205da174",
+                "1a8d08504ced80b0"
+            ]
+        ]
+    },
+    {
+        "id": "030e6d5e64bf2215",
+        "type": "inject",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Schwelle Solar",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "500",
+        "payloadType": "num",
+        "x": 140,
+        "y": 519,
+        "wires": [
+            [
+                "e63c3dba1cd08de8"
+            ]
+        ]
+    },
+    {
+        "id": "e63c3dba1cd08de8",
+        "type": "ui_slider",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Solar Grenzwert Watt einstellen",
+        "label": "Grenzwert Watt",
+        "tooltip": "",
+        "group": "3b18bed1450c9878",
+        "order": 6,
+        "width": 6,
+        "height": 3,
+        "passthru": true,
+        "outs": "end",
+        "topic": "thresholdsolar",
+        "topicType": "str",
+        "min": "150",
+        "max": "3000",
+        "step": "25",
+        "className": "",
+        "x": 430,
+        "y": 520,
+        "wires": [
+            [
+                "e4163a6c1a155bb4",
+                "02ad5aae205da174",
+                "3eecca5ce515b52c"
+            ]
+        ]
+    },
+    {
+        "id": "e4163a6c1a155bb4",
+        "type": "ui_text",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "group": "3b18bed1450c9878",
+        "order": 9,
+        "width": 5,
+        "height": 2,
+        "name": "",
+        "label": "BOOST beenden unter (Solar)",
+        "format": "{{msg.payload}} Watt",
+        "layout": "col-center",
+        "className": "",
+        "style": true,
+        "font": "Arial Black,Arial Black,Gadget,sans-serif",
+        "fontSize": "18",
+        "color": "#ff9200",
+        "x": 950,
+        "y": 519,
+        "wires": []
+    },
+    {
+        "id": "573dde1f82267408",
+        "type": "function",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Dynamische Werte für Gauge",
+        "func": "const value = msg.payload;\n\n// Rundung auf ganze Zahlen\nconst roundedValue = Math.round(value);\n\nconst absValue = Math.abs(roundedValue);\n\n// Berechnung des maxWert, 120% vom absoluten Wert, immer im positiven Bereich\nlet maxWert = Math.round(absValue * 1.2 + 200);\n\n// Berechnung des minWert, abhängig davon, ob value positiv oder negativ ist\nlet minWert = roundedValue < 0 ? Math.round(-absValue * 1.5) : Math.round(-absValue * 0.5);\n\nlet minSeg = Math.round(absValue * 0.4);  // 40% vom absoluten Wert\nlet maxSeg = Math.round(absValue * 0.8);  // 80% vom absoluten Wert\n\n// Debug-Ausgabe zur Überprüfung\n// node.warn(\"Haus Verbrauch - Max Wert: \" + maxWert + \", Min Wert: \" + minWert + \", Min Seg: \" + minSeg + \", Max Seg: \" + maxSeg);\n\nmsg = {\n    ui_control: {\n        gtype: \"gage\",\n        min: minWert,\n        max: maxWert,\n        colors: [\"red\", \"orange\", \"green\"],\n        seg1: minSeg,\n        seg2: maxSeg\n    },\n    // Sende die gerundeten Werte an das ui_gauge\n    payload: roundedValue\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 628,
+        "wires": [
+            [
+                "6d02d08b05d294d1"
+            ]
+        ]
+    },
+    {
+        "id": "2c75e1915891a96e",
+        "type": "function",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "LED Farbe steuern",
+        "func": "var led = msg.payload;\nif (led == \"on\") {\n    msg.payload = true;\n} else if (led == \"off\") {\n    msg.payload = false;\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 240,
+        "wires": [
+            [
+                "20a63eef0ba4f3c6"
+            ]
+        ]
+    },
+    {
+        "id": "b2bd78e514f07082",
+        "type": "function",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Dynamische Werte",
+        "func": "const value = msg.payload;\n\n// Rundung auf ganze Zahlen\nconst roundedValue = Math.round(value);\n\nconst absValue = Math.abs(roundedValue);\n\n// Berechnung des maxWert, 120% vom absoluten Wert, immer im positiven Bereich\nlet maxWert = Math.round(absValue * 1.2 + 200);\n\n// Berechnung des minWert, abhängig davon, ob value positiv oder negativ ist\nlet minWert = roundedValue < 0 ? Math.round(-absValue * 1.5) : Math.round(-absValue * 0.5);\n\nlet minSeg = Math.round(absValue * 0.4);  // 40% vom absoluten Wert\nlet maxSeg = Math.round(absValue * 0.8);  // 80% vom absoluten Wert\n\n// Debug-Ausgabe zur Überprüfung\n// node.warn(\"Einspeisung - Max Wert: \" + maxWert + \", Min Wert: \" + minWert + \", Min Seg: \" + minSeg + \", Max Seg: \" + maxSeg);\n\nmsg = {\n    ui_control: {\n        gtype: \"gage\",\n        min: minWert,\n        max: maxWert,\n        colors: [\"red\", \"orange\", \"green\"],\n        seg1: minSeg,\n        seg2: maxSeg\n    },\n    // Sende die gerundeten Werte an das ui_gauge\n    payload: roundedValue\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 240,
+        "wires": [
+            [
+                "fc1e048978525d93"
+            ]
+        ]
+    },
+    {
+        "id": "b5015436dff96404",
+        "type": "ui_text",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "group": "3b18bed1450c9878",
+        "order": 8,
+        "width": 2,
+        "height": 2,
+        "name": "",
+        "label": "&&",
+        "format": "",
+        "layout": "col-center",
+        "className": "",
+        "style": true,
+        "font": "Arial Black,Arial Black,Gadget,sans-serif",
+        "fontSize": "24",
+        "color": "#ff9200",
+        "x": 730,
+        "y": 596,
+        "wires": []
+    },
+    {
+        "id": "4f72183c2032b57f",
+        "type": "pushover",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "PV BOOST an",
+        "device": "HandyX",
+        "title": "PV Boiler Aktivierung",
+        "priority": 0,
+        "sound": "climb",
+        "url": "",
+        "url_title": "",
+        "html": false,
+        "x": 1000,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "1a8d08504ced80b0",
+        "type": "debug",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "%",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "topic:payload",
+        "statusType": "auto",
+        "x": 550,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "6f42c5bc3d35bcde",
+        "type": "debug",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "W",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "topic:payload",
+        "statusType": "auto",
+        "x": 350,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "d1a3ea2ff70442c4",
+        "type": "change",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Text bauen",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "BOOST wurde aktiviert",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 810,
+        "y": 340,
+        "wires": [
+            [
+                "4f72183c2032b57f"
+            ]
+        ]
+    },
+    {
+        "id": "0e94415422a04522",
+        "type": "function",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Prüfe Zustand ON",
+        "func": "// Hole den letzten bekannten Zustand\nlet lastState = context.get('lastState') || 'off';\n\n// Aktueller Zustand\nlet currentState = msg.payload;\n\n// Wenn der letzte Zustand 'off' war und der neue Zustand 'on' ist, Nachricht senden\nif (lastState === 'off' && currentState === 'on') {\n    // Zustand aktualisieren\n    context.set('lastState', 'on');\n    return [msg, null]; // Nachricht weiterleiten\n} else {\n    // Zustand aktualisieren (bei 'off' oder wiederholtem 'on')\n    context.set('lastState', currentState);\n    return [null, null]; // Keine Nachricht senden\n}\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 320,
+        "wires": [
+            [
+                "d1a3ea2ff70442c4",
+                "9e8ec577ac9bd8c8"
+            ]
+        ],
+        "info": "// Hole den letzten bekannten Zustand\nlet lastState = context.get('lastState') || 'off';\n\n// Aktueller Zustand\nlet currentState = msg.payload;\n\n// Debug-Ausgabe für Akku, Solar und Threshold-Werte\nnode.warn(\"Letzter Zustand: \" + lastState + \", Aktueller Zustand: \" + currentState);\n\n// Wenn der letzte Zustand 'off' war und der neue Zustand 'on' ist, Nachricht senden\nif (lastState === 'off' && currentState === 'on') {\n    // Zustand aktualisieren\n    context.set('lastState', 'on');\n    return msg; // Nachricht weiterleiten\n} else {\n    // Zustand aktualisieren (bei 'off' oder wiederholtem 'on')\n    context.set('lastState', currentState);\n    return null; // Keine Nachricht senden\n}"
+    },
+    {
+        "id": "02fd191bf7410fb6",
+        "type": "debug",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Grenze Akku",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 450,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "3eecca5ce515b52c",
+        "type": "debug",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Grenze Einspeisung",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 680,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "9e8ec577ac9bd8c8",
+        "type": "debug",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Zustand",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 640,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "af696281252ae973",
+        "type": "inject",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Verbinden",
+        "props": [
+            {
+                "p": "action",
+                "v": "connect",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "20dc12569de7555f"
+            ]
+        ]
+    },
+    {
+        "id": "20dc12569de7555f",
+        "type": "mqtt in",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Alle E3DC Topics",
+        "topic": "",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "88539582a8a310de",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 1,
+        "x": 160,
+        "y": 380,
+        "wires": [
+            [
+                "22137cec5a557070"
+            ]
+        ]
+    },
+    {
+        "id": "18f60484b67ec067",
+        "type": "inject",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "MQTT Subscribe",
+        "props": [
+            {
+                "p": "action",
+                "v": "subscribe",
+                "vt": "str"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "Haus/Keller/e3dc/#",
+        "x": 150,
+        "y": 320,
+        "wires": [
+            [
+                "20dc12569de7555f"
+            ]
+        ]
+    },
+    {
+        "id": "22137cec5a557070",
+        "type": "debug",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "E3DC Topics",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 250,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "a40133bad02c1719",
+        "type": "function",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Prüfe Zustand OFF",
+        "func": "// Hole den letzten bekannten Zustand\nlet lastState = context.get('lastState') || 'on';\n\n// Aktueller Zustand\nlet currentState = msg.payload;\n\n// Debug-Ausgabe für Akku, Solar und Threshold-Werte\nnode.warn(\"Letzter Zustand: \" + lastState + \", Aktueller Zustand: \" + currentState);\n\n// Wenn der letzte Zustand 'on' war und der neue Zustand 'off' ist, Nachricht senden\nif (lastState === 'on' && currentState === 'off') {\n    // Zustand aktualisieren\n    context.set('lastState', 'off');\n    return msg; // Nachricht weiterleiten\n} else {\n    // Zustand aktualisieren (bei 'on' oder wiederholtem 'off')\n    context.set('lastState', currentState);\n    return null; // Keine Nachricht senden\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 360,
+        "wires": [
+            [
+                "fc4917821ea2fc51",
+                "a45718bdbbd4e11d"
+            ]
+        ],
+        "info": "// Hole den letzten bekannten Zustand\nlet lastState = context.get('lastState') || 'on';\n\n// Aktueller Zustand\nlet currentState = msg.payload;\n\n// Debug-Ausgabe für Akku, Solar und Threshold-Werte\nnode.warn(\"Letzter Zustand: \" + lastState + \", Aktueller Zustand: \" + currentState);\n\n// Wenn der letzte Zustand 'on' war und der neue Zustand 'off' ist, Nachricht senden\nif (lastState === 'on' && currentState === 'off') {\n    // Zustand aktualisieren\n    context.set('lastState', 'off');\n    return msg; // Nachricht weiterleiten\n} else {\n    // Zustand aktualisieren (bei 'on' oder wiederholtem 'off')\n    context.set('lastState', currentState);\n    return null; // Keine Nachricht senden\n}\n"
+    },
+    {
+        "id": "fc4917821ea2fc51",
+        "type": "change",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Text bauen",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "Bolier heizen wurde deaktiviert",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 810,
+        "y": 380,
+        "wires": [
+            [
+                "b2ab691f890f8bd0"
+            ]
+        ]
+    },
+    {
+        "id": "a45718bdbbd4e11d",
+        "type": "debug",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Zustand",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": true,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "payload",
+        "statusType": "auto",
+        "x": 640,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "9f2ced77c1845ad8",
+        "type": "ui_switch",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "Shelly AN / AUS",
+        "label": "Shelly AN / AUS (manuell)",
+        "tooltip": "",
+        "group": "3b18bed1450c9878",
+        "order": 11,
+        "width": 12,
+        "height": 3,
+        "passthru": false,
+        "decouple": "true",
+        "topic": "",
+        "topicType": "str",
+        "style": "",
+        "onvalue": "on",
+        "onvalueType": "str",
+        "onicon": "fa-power-off fa-2x",
+        "oncolor": "green",
+        "offvalue": "off",
+        "offvalueType": "str",
+        "officon": "fa-power-off fa-2x",
+        "offcolor": "red",
+        "animate": true,
+        "className": "",
+        "x": 540,
+        "y": 100,
+        "wires": [
+            [
+                "dfc61f75940d3c66",
+                "2c75e1915891a96e"
+            ]
+        ]
+    },
+    {
+        "id": "b2ab691f890f8bd0",
+        "type": "pushover",
+        "z": "7ef373a00e10516c",
+        "g": "0a84b244800e8247",
+        "name": "PV BOOST aus",
+        "device": "HandyX",
+        "title": "PV Boiler Aktivierung",
+        "priority": 0,
+        "sound": "falling",
+        "url": "",
+        "url_title": "",
+        "html": false,
+        "x": 1000,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "88539582a8a310de",
+        "type": "mqtt-broker",
+        "name": "Raspi Mosquitto",
+        "broker": "raspberrypi",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "3b18bed1450c9878",
+        "type": "ui_group",
+        "name": "Warmwasser Boiler BOOST Steuerung",
+        "tab": "af215acfc79f52e9",
+        "order": 1,
+        "disp": true,
+        "width": "18",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "af215acfc79f52e9",
+        "type": "ui_tab",
+        "name": "ShellyPlus Boiler BOOST Steuerung",
+        "icon": "wi-wu-hazy",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    }
+]
