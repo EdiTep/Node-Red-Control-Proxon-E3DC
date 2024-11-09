@@ -89,7 +89,7 @@
         "z": "7ef373a00e10516c",
         "g": "0a84b244800e8247",
         "name": "",
-        "topic": "Haus/Keller/Shelly/Luftentfeuchter/command/switch:0",
+        "topic": "Haus/Keller/Shelly/PVBoiler/command/switch:0",
         "qos": "",
         "retain": "",
         "respTopic": "",
