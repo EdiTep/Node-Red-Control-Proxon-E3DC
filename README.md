@@ -31,6 +31,7 @@ Please leave me an email via PM and I can send you the CSV file.
 3. Install Node-Red with Dashboard
 4. Install RSCP to MQTT Dashboard v1.0
    - Download on Github here: https://github.com/pvtom/rscp2mqtt-dashboard
+   - a few of the E3DC MQTT Topics are used in the flow to calculate the adjusted data
 5. Install node-red-node-pushover - required to send Pushover Messages
    - a pushover account should be created, if you want to use it when the trial period ends, you have to pay $5. See Infos here: https://pushover.net/pricing
 7. Configure ShellyPlus1 and integrate it into the network, so you can use it via MQTT
