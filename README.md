@@ -31,8 +31,10 @@ Please leave me an email via PM and I can send you the CSV file.
 3. Install Node-Red with Dashboard
 4. Install RSCP to MQTT Dashboard v1.0
    - Download on Github here: https://github.com/pvtom/rscp2mqtt-dashboard
-5. Configure ShellyPlus1 and integrate it into the network, so you can use it via MQTT
-6. Connect the switching input of the Shelly to X13 1 + 2
+5. Install node-red-node-pushover - required to send Pushover Messages
+   - a pushover account should be created, if you want to use it when the trial period ends, you have to pay $5. See Infos here: https://pushover.net/pricing
+7. Configure ShellyPlus1 and integrate it into the network, so you can use it via MQTT
+8. Connect the switching input of the Shelly to X13 1 + 2
     
 ## Node-Red Flow
 The flow is available as a JSON file in the project and can be downloaded or the JSON code can be copied
