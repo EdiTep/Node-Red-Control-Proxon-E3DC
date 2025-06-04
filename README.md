@@ -46,3 +46,9 @@ The flow is available as a JSON file in the project and can be downloaded or the
 
 ## Documentation to set the T300 Parameters
 A PDF-File with the Docu with screenshots is also available here in the project
+
+## Picture of the Node-Red Dashboard:
+
+<p align="center">
+  <img src="pictures/Node-Red-Dashboard.jpg" alt="Picture of the Node-Red Dashboard" width="400"/>
+</p>  
