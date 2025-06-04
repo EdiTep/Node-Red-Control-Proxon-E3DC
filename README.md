@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="pictures/Edis-Blog-IoT-Logo.png" alt="Logo edi.teppert.com Blog" width="600"/>
+</p>  
+
 # Control Proxon T300 hot water storage tank PV priority switching input with ShellyPlus1 via MQTT and Node-Red
 
 ## Overview of the project
